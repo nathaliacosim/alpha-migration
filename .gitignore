@@ -1,0 +1,31 @@
+# Diretórios específicos a serem ignorados
+/SQL/
+/bin/
+/obj/
+/.vs/
+/.vscode/
+/user-secrets/
+
+# Arquivos de usuário
+*.user
+*.suo
+*.userprefs
+
+# Resultados de build
+*.log
+*.nupkg
+*.dll
+*.pdb
+*.cache
+*.exe
+
+# Arquivos de configuração local
+appsettings.local.json
+appsettings.Development.json
+
+# Rider/Resharper
+_ReSharper.*
+*.sln.iml
+
+# MacOS
+.DS_Store
