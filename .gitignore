@@ -1,5 +1,6 @@
 # Diretórios específicos a serem ignorados
 /SQL/
+/ILLink/
 /bin/
 /obj/
 /.vs/
