@@ -17,11 +17,7 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        //await TratarMetodoDepreciacao();
-        //await TratarLocalizacoesFisicas();
-        await TratarTiposBens();
-        //await TratarFornecedores();
-        //await TratarCentroCustos();
+        await TratarGrupoBens();
     }
 
     public async Task TratarMetodoDepreciacao()
@@ -38,8 +34,14 @@ public class ProcesssaDados
 
     public async Task TratarTiposBens()
     {
-        TipoBensController tipoBensController = new TipoBensController(_pgConnect, _token);
-        await tipoBensController.EnviarTiposBensParaCloud();
+        //TipoBensController tipoBensController = new TipoBensController(_pgConnect, _token);
+        //await tipoBensController.EnviarTiposBensParaCloud();
+    }
+
+    public async Task TratarGrupoBens()
+    {
+        GrupoBensController grupoBensController = new GrupoBensController(_pgConnect, _token);
+        await grupoBensController.EnviarGruposBensParaCloud();
     }
 
     public async Task TratarCentroCustos()
