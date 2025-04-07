@@ -129,16 +129,20 @@
     <Compile Include="Controllers\FornecedorController.cs" />
     <Compile Include="Controllers\LocalizacaoFisicaController.cs" />
     <Compile Include="Controllers\MetodoDepreciacaoController.cs" />
+    <Compile Include="Controllers\TipoBensController.cs" />
     <Compile Include="Data\PgConnect.cs" />
     <Compile Include="Models\Alpha\Fornecedor.cs" />
     <Compile Include="Models\Alpha\Local.cs" />
+    <Compile Include="Models\Alpha\TipoBem.cs" />
     <Compile Include="Models\BethaCloud\Fornecedor.cs" />
     <Compile Include="Models\BethaCloud\LocalizacaoFisica.cs" />
     <Compile Include="Models\BethaCloud\MetodoDepreciacao.cs" />
+    <Compile Include="Models\BethaCloud\TipoBem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UseCase\ProcesssaDados.cs" />
     <Compile Include="Utils\GeradorDocumentos.cs" />
+    <Compile Include="Utils\StringHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
