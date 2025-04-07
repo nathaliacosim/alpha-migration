@@ -1,5 +1,5 @@
-﻿using System;
-using Npgsql;
+﻿using Npgsql;
+using System;
 using System.Data;
 using System.Threading.Tasks;
 

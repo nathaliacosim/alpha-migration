@@ -3,8 +3,6 @@ using Alpha.Models.BethaCloud;
 using Dapper;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,7 +62,7 @@ public class MetodoDepreciacaoController
                 return;
             }
 
-            var query = @"INSERT INTO metodo_depreciacao_cloud (id_cloud, descricao, tipo) 
+            var query = @"INSERT INTO metodo_depreciacao_cloud (id_cloud, descricao, tipo)
                           VALUES (@IdCloud, @Descricao, @Tipo)";
 
             using var connection = _pgConnect.GetConnection();

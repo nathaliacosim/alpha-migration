@@ -3,6 +3,7 @@
 namespace Alpha.Models.BethaCloud;
 
 /* POST */
+
 public class MetodoDepreciacaoPOST
 {
     public string descricao { get; set; }
@@ -21,8 +22,8 @@ public class TipoDepreciacaoPOST
     public string valor { get; set; }
 }
 
-
 /* GET */
+
 public class MetodoDepreciacaoGET
 {
     public int offset { get; set; }

@@ -17,7 +17,8 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarMetodoDepreciacao();
+        //await TratarMetodoDepreciacao();
+        await TratarLocalizacoesFisicas();
         //await TratarFornecedores();
         //await TratarCentroCustos();
     }
@@ -25,19 +26,25 @@ public class ProcesssaDados
     public async Task TratarMetodoDepreciacao()
     {
         MetodoDepreciacaoController metodoDepreciacaoController = new MetodoDepreciacaoController(_pgConnect, _token);
-        await metodoDepreciacaoController.EnviarMetodoDepreciacaoPadrao();
+        //await metodoDepreciacaoController.EnviarMetodoDepreciacaoPadrao();
+    }
+
+    public async Task TratarLocalizacoesFisicas()
+    {
+        LocalizacaoFisicaController localizacaoFisicaController = new LocalizacaoFisicaController(_pgConnect, _token);
+        await localizacaoFisicaController.EnviarLocalizacoesParaCloud();
     }
 
     public async Task TratarCentroCustos()
     {
-        //CentroCustoController cc = new CentroCustoController(_pgConnection, _odbcConnection, _token);
+        //CentroCustoController cc = new CentroCustoController(_pgConnect, _token);
 
         //await cc.InserirCentroCustosBethaDesktopNoPostgres();
     }
 
     public async Task TratarFornecedores()
     {
-        //FornecedorController fc = new FornecedorController(_pgConnection, _odbcConnection, _token);
+        FornecedorController fc = new FornecedorController(_pgConnect, _token);
 
         //await fc.InserirFornecedoresBethaDesktopNoPostgres();
         //await fc.AtualizarFornecedoresSemCnpjCpf();

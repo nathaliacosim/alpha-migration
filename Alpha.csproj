@@ -126,12 +126,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\FornecedorController.cs" />
+    <Compile Include="Controllers\LocalizacaoFisicaController.cs" />
     <Compile Include="Controllers\MetodoDepreciacaoController.cs" />
     <Compile Include="Data\PgConnect.cs" />
+    <Compile Include="Models\Alpha\Fornecedor.cs" />
+    <Compile Include="Models\Alpha\Local.cs" />
+    <Compile Include="Models\BethaCloud\Fornecedor.cs" />
+    <Compile Include="Models\BethaCloud\LocalizacaoFisica.cs" />
     <Compile Include="Models\BethaCloud\MetodoDepreciacao.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UseCase\ProcesssaDados.cs" />
+    <Compile Include="Utils\GeradorDocumentos.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -139,7 +146,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Alpha\" />
     <Folder Include="Models\BethaDesktop\" />
     <Folder Include="Models\Mercato\" />
   </ItemGroup>
