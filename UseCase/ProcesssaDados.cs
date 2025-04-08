@@ -17,7 +17,7 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarGrupoBens();
+        await TratarSubgrupoBens();
     }
 
     public async Task TratarMetodoDepreciacao()
@@ -40,8 +40,14 @@ public class ProcesssaDados
 
     public async Task TratarGrupoBens()
     {
-        GrupoBensController grupoBensController = new GrupoBensController(_pgConnect, _token);
-        await grupoBensController.EnviarGruposBensParaCloud();
+        //GrupoBensController grupoBensController = new GrupoBensController(_pgConnect, _token);
+        //await grupoBensController.EnviarGruposBensParaCloud();
+    }
+
+    public async Task TratarSubgrupoBens()
+    {
+        SubgrupoBensController subgrupoBensController = new SubgrupoBensController(_pgConnect, _token);
+        await subgrupoBensController.EnviarSubgruposBensParaCloud();
     }
 
     public async Task TratarCentroCustos()
