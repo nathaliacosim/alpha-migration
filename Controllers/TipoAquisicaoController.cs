@@ -94,7 +94,6 @@ public class TipoAquisicaoController
             {
                 Console.WriteLine($"❌ Erro ao enviar o tipo de aquisição {tipoAquisicao.codigo}: {e.Message}");
             }
-
         }
     }
 }
