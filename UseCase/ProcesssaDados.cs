@@ -8,16 +8,18 @@ public class ProcesssaDados
 {
     private readonly PgConnect _pgConnect;
     private readonly string _token;
+    private readonly string _urlBase;
 
-    public ProcesssaDados(PgConnect pgConnect, string token)
+    public ProcesssaDados(PgConnect pgConnect, string token, string urlBase)
     {
         _pgConnect = pgConnect;
         _token = token;
+        _urlBase = urlBase;
     }
 
     public async Task Executar()
     {
-        await TratarSubgrupoBens();
+        await TratarEstadoConservacao();
     }
 
     public async Task TratarMetodoDepreciacao()
@@ -46,8 +48,14 @@ public class ProcesssaDados
 
     public async Task TratarSubgrupoBens()
     {
-        SubgrupoBensController subgrupoBensController = new SubgrupoBensController(_pgConnect, _token);
-        await subgrupoBensController.EnviarSubgruposBensParaCloud();
+        //SubgrupoBensController subgrupoBensController = new SubgrupoBensController(_pgConnect, _token);
+        //await subgrupoBensController.EnviarSubgruposBensParaCloud();
+    }
+
+    public async Task TratarEstadoConservacao()
+    {
+        EstadoConservacaoController estadoConservacaoController = new EstadoConservacaoController(_pgConnect, _token, _urlBase);
+        await estadoConservacaoController.EnviarEstadosConservacaoParaCloud();
     }
 
     public async Task TratarCentroCustos()

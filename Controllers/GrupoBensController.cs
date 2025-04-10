@@ -17,12 +17,14 @@ public class GrupoBensController
     private readonly PgConnect _pgConnect;
     private readonly string _token;
     private readonly HttpClient _httpClient;
-    private readonly string _urlBase = "https://patrimonio.betha.cloud/patrimonio-services/api/grupos-bem";
+    private readonly string _urlBase;
+    private readonly string _rota = "api/grupos-bem";
 
-    public GrupoBensController(PgConnect pgConnect, string token)
+    public GrupoBensController(PgConnect pgConnect, string token, string urlBase)
     {
         _pgConnect = pgConnect;
         _token = token;
+        _urlBase = $"{urlBase}{_rota}";
         _httpClient = new HttpClient
         {
             DefaultRequestHeaders = { { "Authorization", $"Bearer {_token}" } }
@@ -70,7 +72,6 @@ public class GrupoBensController
         }
     }
 
-
     public async Task<string> SelecionarIdCloudTipoBem(int codigo)
     {
         try
@@ -94,8 +95,6 @@ public class GrupoBensController
             return null;
         }
     }
-
-
 
     public async Task EnviarGruposBensParaCloud()
     {

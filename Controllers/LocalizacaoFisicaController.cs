@@ -16,12 +16,14 @@ public class LocalizacaoFisicaController
     private readonly PgConnect _pgConnect;
     private readonly string _token;
     private readonly HttpClient _httpClient;
-    private readonly string _urlBase = "https://patrimonio.betha.cloud/patrimonio-services/api/localizacoes-fisicas";
+    private readonly string _urlBase;
+    private readonly string _rota = "api/localizacoes-fisicas";
 
-    public LocalizacaoFisicaController(PgConnect pgConnect, string token)
+    public LocalizacaoFisicaController(PgConnect pgConnect, string token, string urlBase)
     {
         _pgConnect = pgConnect;
         _token = token;
+        _urlBase = $"{urlBase}{_rota}";
         _httpClient = new HttpClient
         {
             DefaultRequestHeaders = { { "Authorization", $"Bearer {_token}" } }

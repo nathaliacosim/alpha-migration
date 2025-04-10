@@ -14,12 +14,14 @@ public class MetodoDepreciacaoController
     private readonly PgConnect _pgConnect;
     private readonly string _token;
     private readonly HttpClient _httpClient;
-    private readonly string _urlBase = "https://patrimonio.betha.cloud/patrimonio-services/api/metodos-depreciacao";
+    private readonly string _urlBase;
+    private readonly string _rota = "api/metodos-depreciacao";
 
-    public MetodoDepreciacaoController(PgConnect pgConnect, string token)
+    public MetodoDepreciacaoController(PgConnect pgConnect, string token, string urlBase)
     {
         _pgConnect = pgConnect;
         _token = token;
+        _urlBase = $"{urlBase}{_rota}";
         _httpClient = new HttpClient
         {
             DefaultRequestHeaders = { { "Authorization", $"Bearer {_token}" } }

@@ -5,10 +5,8 @@ using Dapper;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Alpha.Controllers;
@@ -18,12 +16,14 @@ public class SubgrupoBensController
     private readonly PgConnect _pgConnect;
     private readonly string _token;
     private readonly HttpClient _httpClient;
-    private readonly string _urlBase = "https://patrimonio.betha.cloud/patrimonio-services/api/especies-bem";
+    private readonly string _urlBase;
+    private readonly string _rota = "api/especies-bem";
 
-    public SubgrupoBensController(PgConnect pgConnect, string token)
+    public SubgrupoBensController(PgConnect pgConnect, string token, string urlBase)
     {
         _pgConnect = pgConnect;
         _token = token;
+        _urlBase = $"{urlBase}{_rota}";
         _httpClient = new HttpClient
         {
             DefaultRequestHeaders = { { "Authorization", $"Bearer {_token}" } }

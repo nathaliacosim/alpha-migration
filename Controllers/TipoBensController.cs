@@ -18,12 +18,14 @@ public class TipoBensController
     private readonly PgConnect _pgConnect;
     private readonly string _token;
     private readonly HttpClient _httpClient;
-    private readonly string _urlBase = "https://patrimonio.betha.cloud/patrimonio-services/api/tipos-bem";
+    private readonly string _urlBase;
+    private readonly string _rota = "api/tipos-bem";
 
-    public TipoBensController(PgConnect pgConnect, string token)
+    public TipoBensController(PgConnect pgConnect, string token, string urlBase)
     {
         _pgConnect = pgConnect;
         _token = token;
+        _urlBase = $"{urlBase}{_rota}";
         _httpClient = new HttpClient
         {
             DefaultRequestHeaders = { { "Authorization", $"Bearer {_token}" } }

@@ -15,9 +15,10 @@ public static class Program
         var config = LoadConfiguration();
         var tokenConversao = config["TokenConversao"];
         var pgConnection = ConfigurePostgres(config);
+        var urlBase = "https://services.patrimonio.betha.cloud/patrimonio-services/";
 
         Console.WriteLine("🔧 Tratamento de dados... 🔄");
-        await new ProcesssaDados(pgConnection, tokenConversao).Executar();
+        await new ProcesssaDados(pgConnection, tokenConversao, urlBase).Executar();
 
         Console.WriteLine("✅ Processo finalizado com sucesso!");
     }
