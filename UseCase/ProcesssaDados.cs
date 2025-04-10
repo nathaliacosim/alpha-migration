@@ -19,37 +19,37 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarEstadoConservacao();
+        await TratarTipoUtilizacao();
     }
 
     public async Task TratarMetodoDepreciacao()
     {
-        //MetodoDepreciacaoController metodoDepreciacaoController = new MetodoDepreciacaoController(_pgConnect, _token);
-        //await metodoDepreciacaoController.EnviarMetodoDepreciacaoPadrao();
+        MetodoDepreciacaoController metodoDepreciacaoController = new MetodoDepreciacaoController(_pgConnect, _token, _urlBase);
+        await metodoDepreciacaoController.EnviarMetodoDepreciacaoPadrao();
     }
 
     public async Task TratarLocalizacoesFisicas()
     {
-        //LocalizacaoFisicaController localizacaoFisicaController = new LocalizacaoFisicaController(_pgConnect, _token);
-        //await localizacaoFisicaController.EnviarLocalizacoesParaCloud();
+        LocalizacaoFisicaController localizacaoFisicaController = new LocalizacaoFisicaController(_pgConnect, _token, _urlBase);
+        await localizacaoFisicaController.EnviarLocalizacoesParaCloud();
     }
 
     public async Task TratarTiposBens()
     {
-        //TipoBensController tipoBensController = new TipoBensController(_pgConnect, _token);
-        //await tipoBensController.EnviarTiposBensParaCloud();
+        TipoBensController tipoBensController = new TipoBensController(_pgConnect, _token, _urlBase);
+        await tipoBensController.EnviarTiposBensParaCloud();
     }
 
     public async Task TratarGrupoBens()
     {
-        //GrupoBensController grupoBensController = new GrupoBensController(_pgConnect, _token);
-        //await grupoBensController.EnviarGruposBensParaCloud();
+        GrupoBensController grupoBensController = new GrupoBensController(_pgConnect, _token, _urlBase);
+        await grupoBensController.EnviarGruposBensParaCloud();
     }
 
     public async Task TratarSubgrupoBens()
     {
-        //SubgrupoBensController subgrupoBensController = new SubgrupoBensController(_pgConnect, _token);
-        //await subgrupoBensController.EnviarSubgruposBensParaCloud();
+        SubgrupoBensController subgrupoBensController = new SubgrupoBensController(_pgConnect, _token, _urlBase);
+        await subgrupoBensController.EnviarSubgruposBensParaCloud();
     }
 
     public async Task TratarEstadoConservacao()
@@ -58,17 +58,16 @@ public class ProcesssaDados
         await estadoConservacaoController.EnviarEstadosConservacaoParaCloud();
     }
 
-    public async Task TratarCentroCustos()
+    public async Task TratarTipoUtilizacao()
     {
-        //CentroCustoController cc = new CentroCustoController(_pgConnect, _token);
-        //await cc.InserirCentroCustosBethaDesktopNoPostgres();
+        TipoUtilizacaoController tipoUtilizacaoController = new TipoUtilizacaoController(_pgConnect, _token, _urlBase);
+        await tipoUtilizacaoController.EnviarTiposUtilizacaoParaCloud();
     }
 
     public async Task TratarFornecedores()
     {
-        //FornecedorController fc = new FornecedorController(_pgConnect, _token);
-        //await fc.InserirFornecedoresBethaDesktopNoPostgres();
-        //await fc.AtualizarFornecedoresSemCnpjCpf();
+        FornecedorController fc = new FornecedorController(_pgConnect, _token, _urlBase);
+        await fc.AtualizarFornecedoresSemCnpjCpf();
         //await fc.EnviarFornecedoresParaCloud();
         //await fc.BuscarFornecedoresCloud();
     }

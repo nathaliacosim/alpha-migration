@@ -133,6 +133,7 @@
     <Compile Include="Controllers\MetodoDepreciacaoController.cs" />
     <Compile Include="Controllers\SubgrupoBensController.cs" />
     <Compile Include="Controllers\TipoBensController.cs" />
+    <Compile Include="Controllers\TipoUtilizacaoController.cs" />
     <Compile Include="Data\PgConnect.cs" />
     <Compile Include="Models\Alpha\EstadoConservacao.cs" />
     <Compile Include="Models\Alpha\Fornecedor.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="Models\Alpha\Local.cs" />
     <Compile Include="Models\Alpha\SubgrupoBens.cs" />
     <Compile Include="Models\Alpha\TipoBem.cs" />
+    <Compile Include="Models\Alpha\TipoUtilizacao.cs" />
     <Compile Include="Models\BethaCloud\EstadoConservacao.cs" />
     <Compile Include="Models\BethaCloud\Fornecedor.cs" />
     <Compile Include="Models\BethaCloud\GrupoBens.cs" />
@@ -147,6 +149,7 @@
     <Compile Include="Models\BethaCloud\MetodoDepreciacao.cs" />
     <Compile Include="Models\BethaCloud\SubgrupoBens.cs" />
     <Compile Include="Models\BethaCloud\TipoBem.cs" />
+    <Compile Include="Models\BethaCloud\TipoUtilizacao.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UseCase\ProcesssaDados.cs" />
