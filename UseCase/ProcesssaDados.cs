@@ -19,7 +19,7 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarTipoUtilizacao();
+        await TratarTipoAquisicao();
     }
 
     public async Task TratarMetodoDepreciacao()
@@ -62,6 +62,12 @@ public class ProcesssaDados
     {
         TipoUtilizacaoController tipoUtilizacaoController = new TipoUtilizacaoController(_pgConnect, _token, _urlBase);
         await tipoUtilizacaoController.EnviarTiposUtilizacaoParaCloud();
+    }
+
+    public async Task TratarTipoAquisicao()
+    {
+        TipoAquisicaoController tipoAquisicaoController = new TipoAquisicaoController(_pgConnect, _token, _urlBase);
+        await tipoAquisicaoController.EnviarTiposAquisicaoParaCloud();
     }
 
     public async Task TratarFornecedores()
