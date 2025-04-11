@@ -1,5 +1,6 @@
 ﻿using Alpha.Controllers;
 using Alpha.Data;
+using Alpha.Utils;
 using System.Threading.Tasks;
 
 namespace Alpha.UseCase;
@@ -19,7 +20,7 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarTipoAquisicao();
+        await TratarBens();
     }
 
     public async Task TratarMetodoDepreciacao()
@@ -76,5 +77,13 @@ public class ProcesssaDados
         await fc.AtualizarFornecedoresSemCnpjCpf();
         //await fc.EnviarFornecedoresParaCloud();
         //await fc.BuscarFornecedoresCloud();
+    }
+
+    public async Task TratarBens()
+    {
+        var sqlHelper = new SqlHelper(_pgConnect);
+        BensController bemController = new BensController(_pgConnect, _token, _urlBase, sqlHelper);
+        await bemController.EnviarBensParaCloud();
+        //await bemController.ExcluirBensCloud();
     }
 }
