@@ -83,7 +83,9 @@ public class ProcesssaDados
     {
         var sqlHelper = new SqlHelper(_pgConnect);
         BensController bemController = new BensController(_pgConnect, _token, _urlBase, sqlHelper);
-        await bemController.EnviarBensParaCloud();
+        //await bemController.EnviarBensParaCloud();
         //await bemController.ExcluirBensCloud();
+        //await bemController.AguardarTombamento();
+        await bemController.TombarBens();
     }
 }

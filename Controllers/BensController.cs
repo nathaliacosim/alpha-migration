@@ -274,4 +274,163 @@ public class BensController
             Console.WriteLine($"📄 Resposta da API: {responseContent}");
         }
     }
+
+    public async Task<List<Bens>> SelecionarBensComDataTombamento()
+    {
+        const string query = "SELECT * FROM pat_bens WHERE tombamento_data is not null ORDER BY tombamento_data, codigo;";
+        try
+        {
+            using var connection = _pgConnect.GetConnection();
+            var bens = (await connection.QueryAsync<Bens>(query)).ToList();
+            Console.WriteLine($"✅ {bens.Count} bens com data de tombamento encontrados!");
+            return bens;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Erro ao selecionar os bens: {ex.Message}");
+            return null;
+        }
+    }
+
+    public async Task AguardarTombamento()
+    {
+        var bens = await SelecionarBensComDataTombamento();
+        if (bens == null || !bens.Any())
+        {
+            Console.WriteLine("❌ Nenhum bem encontrado com data de tombamento!");
+            return;
+        }
+
+        foreach (var item in bens)
+        {
+            var url = $"{_urlBase}/{item.id_cloud}/aguardarTombamento";
+            Console.WriteLine($"🔄 Iniciando solicitação para aguardar tombamento do bem 🏷️ {item.codigo}...");
+
+            try
+            {
+                var response = await _httpClient.PostAsync(url, null);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"⚠️ Falha na requisição (HTTP {response.StatusCode}) para o bem {item.codigo}.");
+                    Console.WriteLine($"📄 Detalhes: {responseContent}");
+                    continue;
+                }
+
+                Console.WriteLine($"✅ Tombamento aguardado com sucesso para o bem {item.codigo}.");
+                Console.WriteLine($"📄 Resposta da API: {responseContent}");
+
+                if (responseContent.Contains("message"))
+                {
+                    Console.WriteLine($"❌ A API retornou uma mensagem de erro para o bem {item.codigo}: {responseContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro inesperado ao processar o bem {item.codigo}: {ex.Message}");
+            }
+
+            Console.WriteLine(new string('-', 60));
+        }
+    }
+
+    public async Task DesfazerTombamento()
+    {
+        var bens = await SelecionarBensComDataTombamento();
+        if (bens == null || !bens.Any())
+        {
+            Console.WriteLine("❌ Nenhum bem encontrado com data de tombamento!");
+            return;
+        }
+        foreach (var item in bens)
+        {
+            var url = $"{_urlBase}/{item.id_cloud}/desfazerTombamento";
+            Console.WriteLine($"🔄 Iniciando solicitação para desfazer tombamento do bem 🏷️ {item.codigo}...");
+            try
+            {
+                var response = await _httpClient.PostAsync(url, null);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"⚠️ Falha na requisição (HTTP {response.StatusCode}) para o bem {item.codigo}.");
+                    Console.WriteLine($"📄 Detalhes: {responseContent}");
+                    continue;
+                }
+
+                Console.WriteLine($"✅ Tombamento desfeito com sucesso para o bem {item.codigo}.");
+                Console.WriteLine($"📄 Resposta da API: {responseContent}");
+                if (responseContent.Contains("message"))
+                {
+                    Console.WriteLine($"❌ A API retornou uma mensagem de erro para o bem {item.codigo}: {responseContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro inesperado ao processar o bem {item.codigo}: {ex.Message}");
+            }
+            Console.WriteLine(new string('-', 60));
+        }
+    }
+
+    public async Task TombarBens()
+    {
+        var bens = await SelecionarBensComDataTombamento();
+        if (bens == null || !bens.Any())
+        {
+            Console.WriteLine("❌ Nenhum bem encontrado com data de tombamento!");
+            return;
+        }
+
+        foreach (var item in bens)
+        {
+            Console.WriteLine($"🔄 Iniciando tombamento do bem 🏷️ {item.codigo}...");
+
+            var url = $"{_urlBase}/{item.id_cloud}/tombar";
+            var numeroPlaca = (item.plaqueta == null || item.plaqueta == 0)
+                ? $"BTH{item.codigo}"
+                : item.plaqueta.ToString();
+
+            var dadosTombamento = new TombarBemPOST
+            {
+                nroPlaca = numeroPlaca,
+                organograma = new OrganogramaTombarBemPOST { id = 2394672 },
+                responsavel = new ResponsavelTombarBemPOST { id = 42085454 },
+                dhTombamento = item.nfdata >= item.tombamento_data ? item.tombamento_data?.ToString("yyyy-MM-dd") + " 00:00:00" : item.nfdata?.ToString("yyyy-MM-dd") + " 00:00:00",
+            };
+
+            var jsonPayload = JsonConvert.SerializeObject(dadosTombamento, Formatting.Indented);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+            Console.WriteLine("📦 Dados enviados:");
+            Console.WriteLine(jsonPayload);
+
+            try
+            {
+                var response = await _httpClient.PostAsync(url, content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"⚠️ Erro ao tombar o bem {item.codigo} (HTTP {response.StatusCode})");
+                    Console.WriteLine($"📄 Resposta da API: {responseContent}");
+                    continue;
+                }
+
+                Console.WriteLine($"✅ Tombamento realizado com sucesso para o bem {item.codigo}!");
+                Console.WriteLine($"📄 Resposta da API: {responseContent}");
+
+                if (responseContent.Contains("message"))
+                {
+                    Console.WriteLine($"⚠️ Aviso: A API retornou uma mensagem para o bem {item.codigo}: {responseContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro inesperado ao tombar o bem {item.codigo}: {ex.Message}");
+            }
+
+            Console.WriteLine(new string('-', 70));
+        }
+    }
 }
