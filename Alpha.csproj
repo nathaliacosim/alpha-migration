@@ -127,6 +127,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\BensController.cs" />
+    <Compile Include="Controllers\DepreciacaoBensController.cs" />
+    <Compile Include="Controllers\DepreciacaoController.cs" />
     <Compile Include="Controllers\EstadoConservacaoController.cs" />
     <Compile Include="Controllers\FornecedorController.cs" />
     <Compile Include="Controllers\GrupoBensController.cs" />
@@ -138,6 +140,7 @@
     <Compile Include="Controllers\TipoUtilizacaoController.cs" />
     <Compile Include="Data\PgConnect.cs" />
     <Compile Include="Models\Alpha\Bens.cs" />
+    <Compile Include="Models\Alpha\Depreciacao.cs" />
     <Compile Include="Models\Alpha\EstadoConservacao.cs" />
     <Compile Include="Models\Alpha\Fornecedor.cs" />
     <Compile Include="Models\Alpha\GrupoBens.cs" />
@@ -147,6 +150,7 @@
     <Compile Include="Models\Alpha\TipoBem.cs" />
     <Compile Include="Models\Alpha\TipoUtilizacao.cs" />
     <Compile Include="Models\BethaCloud\Bens.cs" />
+    <Compile Include="Models\BethaCloud\Depreciacao.cs" />
     <Compile Include="Models\BethaCloud\EstadoConservacao.cs" />
     <Compile Include="Models\BethaCloud\Fornecedor.cs" />
     <Compile Include="Models\BethaCloud\GrupoBens.cs" />
@@ -168,10 +172,7 @@
     <None Include=".gitignore" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\BethaDesktop\" />
-    <Folder Include="Models\Mercato\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="SQL\create_tables.sql" />
   </ItemGroup>
