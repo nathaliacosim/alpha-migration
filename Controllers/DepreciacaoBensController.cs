@@ -5,7 +5,9 @@ using Alpha.Utils;
 using Dapper;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -75,7 +77,7 @@ public class DepreciacaoBensController
             {
                 Console.WriteLine($"🔍 Verificando se o bem {bem.codigo} já foi enviado...");
 
-                if (await VerificaSeJaFoiEnviado(bem.id_cloud_depreciacao, bem.id_cloud_bem))
+                if (await VerificaSeJaFoiEnviado(bem.id_cloud_depreciacao, bem.id_cloud))
                 {
                     Console.WriteLine($"ℹ️ Bem {bem.codigo} já foi enviado anteriormente.");
                     enviados++;
@@ -88,6 +90,8 @@ public class DepreciacaoBensController
                     enviados++;
                     Console.WriteLine($"📈 Progresso: {enviados}/{bens.Count} bens enviados.");
                 }
+
+                Console.WriteLine("\n");
             }
 
             if (enviados == cabecalho.qtd_bens)
@@ -98,7 +102,7 @@ public class DepreciacaoBensController
             }
             else
             {
-                Console.WriteLine($"⚠️ {enviados}/{cabecalho.qtd_bens} bens enviados para {cabecalho.mes_ano}. Finalização **não** será feita.");
+                Console.WriteLine($"\n\n\n⚠️ {enviados}/{cabecalho.qtd_bens} bens enviados para {cabecalho.mes_ano}. Finalização **não** será feita.");
                 Console.WriteLine($"⚠️ Verifique os bens que não foram enviados e tente novamente.");
                 return;
             }
@@ -108,8 +112,13 @@ public class DepreciacaoBensController
 
     private async Task<bool> VerificaSeJaFoiEnviado(string idCabecalho, string idBem)
     {
+        if (idBem == null)
+        {
+            Console.WriteLine($"❌ ID do bem é nulo. Não é possível verificar se foi enviado.");
+            return false;
+        }
+
         var url = $"{_urlBase}api/depreciacoes/{idCabecalho}/bens/{idBem}";
-        Console.WriteLine($"🔍 Verificando se o bem {idBem} já foi enviado...");
         Console.WriteLine($"URL: {url}");
 
         try
@@ -117,11 +126,12 @@ public class DepreciacaoBensController
             var response = await _httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
+                Console.WriteLine($"✅ Bem {idBem} já foi enviado!\n");
                 return true;
             }
             else
             {
-                Console.WriteLine($"⚠️ Bem {idBem} não encontrado na API. Status: {response.StatusCode} - {response.ReasonPhrase}");
+                Console.WriteLine($"❌ Bem {idBem} não encontrado na API. Status: {response.StatusCode}\n");
                 return false;
             }
         }
@@ -141,7 +151,13 @@ public class DepreciacaoBensController
 
     private async Task<bool> EnviarBemDepreciadoAsync(DepreciacaoBens bem, int tentativas = 0)
     {
-        const int maxTentativas = 5;
+        if (bem.depreciacao <= 0 || bem.meses_restantes == 0) 
+        {
+            Console.WriteLine($"⚠️ O bem {bem.codigo} não possui valor de depreciação. Não será enviado.");
+            return true; // considera na contagem
+        }
+
+        const int maxTentativas = 3;
 
         var payload = new DepreciacaoBemPOST
         {
@@ -157,6 +173,8 @@ public class DepreciacaoBensController
             notaExplicativa = ""
         };
 
+        
+
         var json = JsonConvert.SerializeObject(payload);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         var url = $"{_urlBase}api/depreciacoes/{bem.id_cloud_depreciacao}/bens";
@@ -171,14 +189,40 @@ public class DepreciacaoBensController
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"✅ Bem {bem.codigo} enviado com sucesso.");
-                return true;
+
+                if (string.IsNullOrWhiteSpace(responseBody))
+                {
+                    Console.WriteLine($"⚠️ Resposta da API está vazia. Não é possível atualizar o banco.");
+                    return false;
+                }
+
+                var queryUp = @"UPDATE pat_bens_depreciacao_mes SET id_cloud = @IdCloud WHERE codigo = @Codigo;";
+                var parameters = new
+                {
+                    IdCloud = responseBody,
+                    Codigo = bem.codigo
+                };
+
+                using var connection = _pgConnect.GetConnection();
+                var rowsAffected = await connection.ExecuteAsync(queryUp, parameters);
+
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"💾 Registro do bem {bem.codigo} atualizado com id_cloud = '{responseBody}'.");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Nenhum registro foi atualizado para o bem {bem.codigo}.");
+                    return false;
+                }
             }
 
-            Console.WriteLine($"❌ Falha ao enviar bem {bem.codigo}: {response.StatusCode} - {response.ReasonPhrase}");
+            Console.WriteLine($"❌ Falha ao enviar bem {bem.codigo}: {response.StatusCode}");
 
             if (tentativas < maxTentativas)
             {
-                Console.WriteLine($"\n🔁 Tentando novamente ({tentativas + 1}/{maxTentativas})...");
+                Console.WriteLine($"🔁 Tentando novamente ({tentativas + 1}/{maxTentativas})...");
                 await Task.Delay(3000);
                 return await EnviarBemDepreciadoAsync(bem, tentativas + 1);
             }

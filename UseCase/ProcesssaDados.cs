@@ -20,7 +20,7 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarDepreciacaoBens();
+        
     }
 
     public async Task TratarMetodoDepreciacao()
@@ -94,11 +94,11 @@ public class ProcesssaDados
         var sqlHelper = new SqlHelper(_pgConnect);
         DepreciacaoController depreciacaoController = new DepreciacaoController(_pgConnect, _token, _urlBase, sqlHelper);
         //await depreciacaoController.InserirDepreciacoes();
-        //await depreciacaoController.EnviarDepreciacoesParaCloud();
+        await depreciacaoController.EnviarDepreciacoesParaCloud();
         //await depreciacaoController.ExcluirDepreciacoesCloud();
     }
 
-    public async Task TratarDepreciacaoBens()
+    public async Task TratarDepreciacoesBens()
     {
         var sqlHelper = new SqlHelper(_pgConnect);
         DepreciacaoBensController dbens = new DepreciacaoBensController(_pgConnect, _token, _urlBase, sqlHelper);
