@@ -44,7 +44,7 @@ public static class Program
         Console.WriteLine($"🔌 Iniciando conexão ODBC ao DNS: {dsn}... ⏳");
 
         var connection = new OdbcConnect(dsn);
-        connection.Connect();
+        connection.GetConnection();
         return connection;
     }
 

@@ -170,18 +170,18 @@ public class EspecieBensController
 
     private async Task InserirEspecieBens(ContentEspecieBemGET dados)
     {
-        if(dados == null)
+        if (dados == null)
         {
             Console.WriteLine("⚠️ Dados da espécie de bens estão nulos.");
             return;
         }
 
         const string queryVerifica = "SELECT COUNT(*) FROM especie_bem_cloud WHERE id_cloud = @id_cloud;";
-        const string queryInsert = @"INSERT INTO especie_bem_cloud (id_cloud, id_grupo_bem, i_conta, i_chave, tipo_chave, descricao) 
+        const string queryInsert = @"INSERT INTO especie_bem_cloud (id_cloud, id_grupo_bem, i_conta, i_chave, tipo_chave, descricao)
                                      VALUES (@id_cloud, @id_grupo_bem, @i_conta, @i_chave, @tipo_chave, @descricao);";
 
         Console.WriteLine("🔄 Inserindo espécies de bens...");
-        
+
         var parametros = new
         {
             id_cloud = dados.id.ToString(),

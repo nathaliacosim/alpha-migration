@@ -16,13 +16,15 @@ namespace Alpha.Controllers;
 public class DepreciacaoBensController
 {
     private readonly PgConnect _pgConnect;
+    private readonly OdbcConnect _odbcConnect;
     private readonly SqlHelper _sqlHelper;
     private readonly HttpClient _httpClient;
     private readonly string _urlBase;
 
-    public DepreciacaoBensController(PgConnect pgConnect, string token, string urlBase, SqlHelper sqlHelper)
+    public DepreciacaoBensController(PgConnect pgConnect, string token, string urlBase, SqlHelper sqlHelper, OdbcConnect odbcConnect)
     {
         _pgConnect = pgConnect ?? throw new ArgumentNullException(nameof(pgConnect));
+        _odbcConnect = odbcConnect ?? throw new ArgumentNullException(nameof(odbcConnect));
         _sqlHelper = sqlHelper ?? throw new ArgumentNullException(nameof(sqlHelper));
         _urlBase = !string.IsNullOrWhiteSpace(urlBase) ? urlBase : throw new ArgumentException("URL base inválida.", nameof(urlBase));
 
@@ -30,13 +32,89 @@ public class DepreciacaoBensController
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
     }
 
-    public async Task<List<Depreciacao>> SelecionarDepreciacoes()
+    #region Conversão Betha
+
+    public async Task<List<DepreciacaoBensBethaDba>> SelecionarDepreciacoesBensBetha()
+    {
+        const string query = @"SELECT i_depreciacao, i_bem, data_depr, valor_calc, i_entidades,
+                            RIGHT('0' + CAST(MONTH(data_depr) AS VARCHAR), 2) AS mes,
+                            CAST(YEAR(data_depr) AS VARCHAR) AS ano
+                           FROM bethadba.depreciacoes;";
+
+        try
+        {
+            using var connection = _odbcConnect.GetConnection();
+            var depreciacoes = await connection.QueryAsync<DepreciacaoBensBethaDba>(query);
+            Console.WriteLine($"✅ {depreciacoes.Count()} depreciações de bens encontradas!");
+
+            return depreciacoes.ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Erro ao selecionar as depreciações de bens: {ex.Message}");
+            return new List<DepreciacaoBensBethaDba>();
+        }
+    }
+
+    public async Task InserirDepreciacoesBensBetha()
+    {
+        var dados = await SelecionarDepreciacoesBensBetha();
+        if (dados.Count == 0)
+        {
+            Console.WriteLine("⚠️ Nenhuma depreciação encontrada no banco.");
+            return;
+        }
+
+        foreach (var item in dados)
+        {
+            const string checkExistsQuery = @"SELECT COUNT(1) FROM depreciacoes_cloud WHERE i_depreciacao = @i_depreciacao;";
+            const string insertQuery = @"INSERT INTO depreciacoes_cloud
+                                    (id_cloud, i_depreciacao, i_bem, id_cloud_depreciacao, data_depreciacao, valor_depreciado, i_entidades)
+                                     VALUES
+                                    (@id_cloud, @i_depreciacao, @i_bem, @id_cloud_depreciacao, @data_depreciacao, @valor_depreciado, @i_entidades)";
+
+            var parametros = new
+            {
+                id_cloud = "",
+                item.i_depreciacao,
+                item.i_bem,
+                id_cloud_depreciacao = (int?)null,
+                data_depreciacao = item.data_depr,
+                valor_depreciado = item.valor_calc,
+                item.i_entidades
+            };
+
+            try
+            {
+                int count = _pgConnect.ExecuteScalar<int>(checkExistsQuery, new { item.i_depreciacao });
+                if (count == 0)
+                {
+                    _pgConnect.Execute(insertQuery, parametros);
+                    Console.WriteLine($"✅ Depreciação de bens {item.i_depreciacao} inserida com sucesso!");
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Depreciação de bens {item.i_depreciacao} já existe no banco.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Erro ao inserir a depreciação de bens: {ex.Message}");
+            }
+        }
+    }
+
+    #endregion Conversão Betha
+
+    #region Conversão Mercato
+
+    public async Task<List<DepreciacaoMercato>> SelecionarDepreciacoes()
     {
         const string query = "SELECT * FROM pat_cabecalho_depreciacao WHERE id_cloud IS NOT NULL AND finalizado = 'false' ORDER BY ano, mes;";
         try
         {
             using var connection = _pgConnect.GetConnection();
-            return (await connection.QueryAsync<Depreciacao>(query)).ToList();
+            return (await connection.QueryAsync<DepreciacaoMercato>(query)).ToList();
         }
         catch (Exception ex)
         {
@@ -318,4 +396,6 @@ public class DepreciacaoBensController
             Console.WriteLine($"❌ Erro ao atualizar status de finalização no banco: {ex.Message}");
         }
     }
+
+    #endregion Conversão Mercato
 }

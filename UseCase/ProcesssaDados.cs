@@ -22,7 +22,7 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarBens();
+        await TratarReavaliacoes();
     }
 
     public async Task TratarOrganogramas()
@@ -95,20 +95,31 @@ public class ProcesssaDados
         await bemController.TombarBensBetha();
     }
 
+    public async Task TratarReavaliacoes()
+    {
+        ReavaliacaoController reavaliacaoController = new ReavaliacaoController(_pgConnect, _token, _urlBase, _odbcConnect);
+        await reavaliacaoController.EnviarReavaliacoesBethaParaCloud();
+    }
+
+    public async Task TratarReavaliacoesBens()
+    {
+        ReavaliacaoBensController reavaliacaoBensController = new ReavaliacaoBensController(_pgConnect, _token, _urlBase, _odbcConnect);
+        await reavaliacaoBensController.InserirReavaliacaoBens();
+    }
+
     public async Task TratarDepreciacoes()
     {
         var sqlHelper = new SqlHelper(_pgConnect);
-        DepreciacaoController depreciacaoController = new DepreciacaoController(_pgConnect, _token, _urlBase, sqlHelper);
+        DepreciacaoController depreciacaoController = new DepreciacaoController(_pgConnect, _token, _urlBase, sqlHelper, _odbcConnect);
         //await depreciacaoController.InserirDepreciacoes();
-        await depreciacaoController.EnviarDepreciacoesParaCloud();
-        //await depreciacaoController.ExcluirDepreciacoesCloud();
+        await depreciacaoController.EnviarDepreciacoesBethaParaCloud();
     }
 
     public async Task TratarDepreciacoesBens()
     {
         var sqlHelper = new SqlHelper(_pgConnect);
-        DepreciacaoBensController dbens = new DepreciacaoBensController(_pgConnect, _token, _urlBase, sqlHelper);
-        await dbens.EnviarDepreciacaoBensParaCloud();
+        DepreciacaoBensController dbens = new DepreciacaoBensController(_pgConnect, _token, _urlBase, sqlHelper, _odbcConnect);
+        await dbens.InserirDepreciacoesBensBetha();
     }
 
     public async Task TratarBaixas()

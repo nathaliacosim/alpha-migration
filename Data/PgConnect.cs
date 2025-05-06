@@ -22,7 +22,7 @@ public class PgConnect
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[PG] Erro ao criar a conexão: {ex.Message}");
+            Console.WriteLine($"❌ Erro ao criar a conexão: {ex.Message}");
             throw;
         }
     }
@@ -33,70 +33,157 @@ public class PgConnect
         try
         {
             connection.Open();
-            Console.WriteLine("[PG] Conexão estabelecida com sucesso!\n");
+            Console.WriteLine("🟢 Conexão estabelecida com sucesso!\n");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[PG] Erro ao conectar ao banco de dados: {ex.Message}");
+            Console.WriteLine($"❌ Erro ao conectar ao banco de dados: {ex.Message}");
+        }
+    }
+
+    public async Task<int> ExecuteNonQueryAsync(string query, object parameters = null)
+    {
+        try
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var command = new NpgsqlCommand(query, connection);
+            AddParameters(command, parameters);
+
+            return await command.ExecuteNonQueryAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Erro ao executar comando: {ex.Message}");
+            return 0;
         }
     }
 
     public async Task<T> ExecuteScalarAsync<T>(string query, object parameters = null)
     {
-        await using var connection = new NpgsqlConnection(_connectionString);
-        await connection.OpenAsync();
-
-        using var command = new NpgsqlCommand(query, connection);
-        AddParameters(command, parameters);
-
         try
         {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var command = new NpgsqlCommand(query, connection);
+            AddParameters(command, parameters);
+
             var result = await command.ExecuteScalarAsync();
             return result == DBNull.Value ? default : (T)Convert.ChangeType(result, typeof(T));
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[PG] Erro ao executar consulta escalar assíncrona: {ex.Message}");
+            Console.WriteLine($"⚠️ Erro ao executar consulta escalar: {ex.Message}");
             return default;
         }
     }
 
     public async Task<int> ExecuteInsertAsync(string query, object parameters)
     {
-        await using var connection = new NpgsqlConnection(_connectionString);
-        await connection.OpenAsync();
-
-        using var command = new NpgsqlCommand(query, connection);
-        AddParameters(command, parameters);
-
         try
         {
+            using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var command = new NpgsqlCommand(query, connection);
+            AddParameters(command, parameters);
+
             var result = await command.ExecuteScalarAsync();
             return result == DBNull.Value ? -1 : Convert.ToInt32(result);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[PG] Erro ao executar inserção assíncrona: {ex.Message}");
+            Console.WriteLine($"⚠️ Erro ao inserir dados (async): {ex.Message}");
             return -1;
         }
     }
 
     public async Task ExecuteAsync(string query, object parameters = null)
     {
-        await using var connection = new NpgsqlConnection(_connectionString);
-        await connection.OpenAsync();
-
-        using var command = new NpgsqlCommand(query, connection);
-        AddParameters(command, parameters);
-
         try
         {
+            await using var connection = new NpgsqlConnection(_connectionString);
+            await connection.OpenAsync();
+            using var command = new NpgsqlCommand(query, connection);
+            AddParameters(command, parameters);
+
             await command.ExecuteNonQueryAsync();
-            Console.WriteLine("[PG] Comando executado com sucesso!\n");
+            Console.WriteLine("✅ Comando executado com sucesso (async)!\n");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[PG] Erro ao executar comando assíncrono: {ex.Message}");
+            Console.WriteLine($"❌ Erro ao executar comando (async): {ex.Message}");
+        }
+    }
+
+    public void Execute(string query, object parameters = null)
+    {
+        try
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+            using var command = new NpgsqlCommand(query, connection);
+            AddParameters(command, parameters);
+
+            command.ExecuteNonQuery();
+            Console.WriteLine("✅ Comando executado com sucesso!\n");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Erro ao executar comando: {ex.Message}");
+        }
+    }
+
+    public int ExecuteInsert(string query, object parameters)
+    {
+        try
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+            using var command = new NpgsqlCommand(query, connection);
+            AddParameters(command, parameters);
+
+            var result = command.ExecuteScalar();
+            return result == DBNull.Value ? -1 : Convert.ToInt32(result);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Erro ao inserir dados: {ex.Message}");
+            return -1;
+        }
+    }
+
+    public T ExecuteScalar<T>(string query, object parameters)
+    {
+        try
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+            using var command = new NpgsqlCommand(query, connection);
+            AddParameters(command, parameters);
+
+            var result = command.ExecuteScalar();
+            return result == DBNull.Value ? default : (T)Convert.ChangeType(result, typeof(T));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Erro ao executar consulta escalar: {ex.Message}");
+            return default;
+        }
+    }
+
+    public void ExecuteCommand(string query)
+    {
+        try
+        {
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+            using var command = new NpgsqlCommand(query, connection);
+            command.ExecuteNonQuery();
+            Console.WriteLine("📥 Comando SQL executado com sucesso!\n");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Erro ao executar comando direto: {ex.Message}");
         }
     }
 
@@ -108,104 +195,6 @@ public class PgConnect
         {
             var value = prop.GetValue(parameters) ?? DBNull.Value;
             command.Parameters.AddWithValue($"@{prop.Name}", value);
-        }
-    }
-
-    public void ExecuteCommand(string query)
-    {
-        using (var connection = new NpgsqlConnection(_connectionString))
-        {
-            try
-            {
-                connection.Open();
-                using (var command = new NpgsqlCommand(query, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[PG] Erro ao executar comando no banco de dados: {ex.Message}");
-            }
-        }
-    }
-
-    public int ExecuteInsert(string query, object parameters)
-    {
-        using (var connection = new NpgsqlConnection(_connectionString))
-        {
-            try
-            {
-                connection.Open();
-                using (var command = new NpgsqlCommand(query, connection))
-                {
-                    foreach (var prop in parameters.GetType().GetProperties())
-                    {
-                        command.Parameters.AddWithValue($"@{prop.Name}", prop.GetValue(parameters) ?? DBNull.Value);
-                    }
-
-                    return Convert.ToInt32(command.ExecuteScalar());
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[PG] Erro ao executar inserção no banco de dados: {ex.Message}");
-                return -1;
-            }
-        }
-    }
-
-    public T ExecuteScalar<T>(string query, object parameters)
-    {
-        using (var connection = new NpgsqlConnection(_connectionString))
-        {
-            try
-            {
-                connection.Open();
-                using (var command = new NpgsqlCommand(query, connection))
-                {
-                    foreach (var prop in parameters.GetType().GetProperties())
-                    {
-                        command.Parameters.AddWithValue($"@{prop.Name}", prop.GetValue(parameters) ?? DBNull.Value);
-                    }
-
-                    var result = command.ExecuteScalar();
-                    return result == DBNull.Value ? default : (T)Convert.ChangeType(result, typeof(T));
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[PG] Erro ao executar consulta escalar no banco de dados: {ex.Message}");
-                return default;
-            }
-        }
-    }
-
-    public void Execute(string query, object parameters = null)
-    {
-        using (var connection = new NpgsqlConnection(_connectionString))
-        {
-            try
-            {
-                connection.Open();
-                using (var command = new NpgsqlCommand(query, connection))
-                {
-                    if (parameters != null)
-                    {
-                        foreach (var prop in parameters.GetType().GetProperties())
-                        {
-                            command.Parameters.AddWithValue($"@{prop.Name}", prop.GetValue(parameters) ?? DBNull.Value);
-                        }
-                    }
-
-                    command.ExecuteNonQuery();
-                    Console.WriteLine("[PG] Comando executado com sucesso!\n");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[PG] Erro ao executar o comando no banco de dados: {ex.Message}");
-            }
         }
     }
 }

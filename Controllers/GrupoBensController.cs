@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -208,7 +207,7 @@ public class GrupoBensController
         }
 
         const string queryVerifica = "SELECT COUNT(*) FROM grupo_bem_cloud WHERE id_cloud = @id_cloud;";
-        const string queryInsert = @"INSERT INTO grupo_bem_cloud (id_cloud, i_conta, descricao, id_tipo_bem, id_metodo_depreciacao, percentual_depreciacao, percentual_residual, vida_util, sigla_tipo_bem, sigla_tipo_conta, sigla_classif_conta) 
+        const string queryInsert = @"INSERT INTO grupo_bem_cloud (id_cloud, i_conta, descricao, id_tipo_bem, id_metodo_depreciacao, percentual_depreciacao, percentual_residual, vida_util, sigla_tipo_bem, sigla_tipo_conta, sigla_classif_conta)
                       VALUES (@id_cloud, @i_conta, @descricao, @id_tipo_bem, @id_metodo_depreciacao, @percentual_depreciacao, @percentual_residual, @vida_util, @sigla_tipo_bem, @sigla_tipo_conta, @sigla_classif_conta);";
 
         var parametros = new

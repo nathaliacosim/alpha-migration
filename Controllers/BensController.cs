@@ -268,7 +268,6 @@ public class BensController
         }
     }
 
-
     public async Task AguardarTombamentoBetha()
     {
         var bens = await SelecionarBensEnviadosBetha();
@@ -426,7 +425,6 @@ public class BensController
             }
         }
     }
-
 
     #endregion Conversão e Migração Sistema Betha
 
