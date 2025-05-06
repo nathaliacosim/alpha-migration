@@ -8,7 +8,7 @@
     <ProjectGuid>{207BF1E5-9916-4C33-8694-F41086EADC2D}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>Alpha</RootNamespace>
-    <AssemblyName>Alpha</AssemblyName>
+    <AssemblyName>Java</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -126,6 +126,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\BaixaBensController.cs" />
+    <Compile Include="Controllers\BaixaController.cs" />
     <Compile Include="Controllers\BensController.cs" />
     <Compile Include="Controllers\DepreciacaoBensController.cs" />
     <Compile Include="Controllers\DepreciacaoController.cs" />
@@ -134,11 +136,14 @@
     <Compile Include="Controllers\GrupoBensController.cs" />
     <Compile Include="Controllers\LocalizacaoFisicaController.cs" />
     <Compile Include="Controllers\MetodoDepreciacaoController.cs" />
-    <Compile Include="Controllers\SubgrupoBensController.cs" />
+    <Compile Include="Controllers\OrganogramaController.cs" />
+    <Compile Include="Controllers\EspecieBensController.cs" />
     <Compile Include="Controllers\TipoAquisicaoController.cs" />
     <Compile Include="Controllers\TipoBensController.cs" />
     <Compile Include="Controllers\TipoUtilizacaoController.cs" />
+    <Compile Include="Data\OdbcConnect.cs" />
     <Compile Include="Data\PgConnect.cs" />
+    <Compile Include="Models\Alpha\Baixas.cs" />
     <Compile Include="Models\Alpha\Bens.cs" />
     <Compile Include="Models\Alpha\Depreciacao.cs" />
     <Compile Include="Models\Alpha\EstadoConservacao.cs" />
@@ -149,6 +154,7 @@
     <Compile Include="Models\Alpha\TipoAquisicao.cs" />
     <Compile Include="Models\Alpha\TipoBem.cs" />
     <Compile Include="Models\Alpha\TipoUtilizacao.cs" />
+    <Compile Include="Models\BethaCloud\Baixas.cs" />
     <Compile Include="Models\BethaCloud\Bens.cs" />
     <Compile Include="Models\BethaCloud\Depreciacao.cs" />
     <Compile Include="Models\BethaCloud\EstadoConservacao.cs" />
@@ -156,7 +162,8 @@
     <Compile Include="Models\BethaCloud\GrupoBens.cs" />
     <Compile Include="Models\BethaCloud\LocalizacaoFisica.cs" />
     <Compile Include="Models\BethaCloud\MetodoDepreciacao.cs" />
-    <Compile Include="Models\BethaCloud\SubgrupoBens.cs" />
+    <Compile Include="Models\BethaCloud\Organograma.cs" />
+    <Compile Include="Models\BethaCloud\EspecieBens.cs" />
     <Compile Include="Models\BethaCloud\TipoAquisicao.cs" />
     <Compile Include="Models\BethaCloud\TipoBem.cs" />
     <Compile Include="Models\BethaCloud\TipoUtilizacao.cs" />
@@ -174,6 +181,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="SQL\betha_sql.sql" />
     <Content Include="SQL\create_tables.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

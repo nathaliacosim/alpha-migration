@@ -5,9 +5,7 @@ using Alpha.Utils;
 using Dapper;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -109,7 +107,6 @@ public class DepreciacaoBensController
         }
     }
 
-
     private async Task<bool> VerificaSeJaFoiEnviado(string idCabecalho, string idBem)
     {
         if (idBem == null)
@@ -151,7 +148,7 @@ public class DepreciacaoBensController
 
     private async Task<bool> EnviarBemDepreciadoAsync(DepreciacaoBens bem, int tentativas = 0)
     {
-        if (bem.depreciacao <= 0 || bem.meses_restantes == 0) 
+        if (bem.depreciacao <= 0)
         {
             Console.WriteLine($"⚠️ O bem {bem.codigo} não possui valor de depreciação. Não será enviado.");
             return true; // considera na contagem
@@ -172,8 +169,6 @@ public class DepreciacaoBensController
             vlDepreciado = bem.depreciacao,
             notaExplicativa = ""
         };
-
-        
 
         var json = JsonConvert.SerializeObject(payload);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -217,17 +212,53 @@ public class DepreciacaoBensController
                     return false;
                 }
             }
-
-            Console.WriteLine($"❌ Falha ao enviar bem {bem.codigo}: {response.StatusCode}");
-
-            if (tentativas < maxTentativas)
+            else
             {
-                Console.WriteLine($"🔁 Tentando novamente ({tentativas + 1}/{maxTentativas})...");
-                await Task.Delay(3000);
-                return await EnviarBemDepreciadoAsync(bem, tentativas + 1);
-            }
+                if (responseBody.Contains("alterar o valor depreciado, o valor atualizado ficará abaixo do valor residual"))
+                {
+                    Console.WriteLine($"⚠️ Bem {bem.codigo} não pode ser enviado (valor depreciado menor que o residual).");
 
-            return false;
+                    var queryUp = @"UPDATE pat_bens_depreciacao_mes SET id_cloud = @IdCloud WHERE codigo = @Codigo;";
+                    var parameters = new
+                    {
+                        IdCloud = "VALOR-NEGATIVO",
+                        Codigo = bem.codigo
+                    };
+
+                    using var connection = _pgConnect.GetConnection();
+                    await connection.ExecuteAsync(queryUp, parameters);
+
+                    return true;
+                }
+
+                if (responseBody.Contains("o tipo de aquisição deve ser diferente de locação ou comodato"))
+                {
+                    Console.WriteLine($"⚠️ Bem {bem.codigo} não pode ser enviado (locação/comodato), será considerado como enviado.");
+
+                    var queryUp = @"UPDATE pat_bens_depreciacao_mes SET id_cloud = @IdCloud WHERE codigo = @Codigo;";
+                    var parameters = new
+                    {
+                        IdCloud = "BEM-IGNORADO",
+                        Codigo = bem.codigo
+                    };
+
+                    using var connection = _pgConnect.GetConnection();
+                    await connection.ExecuteAsync(queryUp, parameters);
+
+                    return true;
+                }
+
+                Console.WriteLine($"❌ Falha ao enviar bem {bem.codigo}: {response.StatusCode}");
+
+                if (tentativas < maxTentativas)
+                {
+                    Console.WriteLine($"🔁 Tentando novamente ({tentativas + 1}/{maxTentativas})...");
+                    await Task.Delay(3000);
+                    return await EnviarBemDepreciadoAsync(bem, tentativas + 1);
+                }
+
+                return false;
+            }
         }
         catch (Exception ex)
         {
@@ -287,5 +318,4 @@ public class DepreciacaoBensController
             Console.WriteLine($"❌ Erro ao atualizar status de finalização no banco: {ex.Message}");
         }
     }
-
 }

@@ -14,11 +14,12 @@ public static class Program
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         var config = LoadConfiguration();
         var tokenConversao = config["TokenConversao"];
+        var odbcConnection = ConfigureOdbc(config);
         var pgConnection = ConfigurePostgres(config);
         var urlBase = "https://services.patrimonio.betha.cloud/patrimonio-services/";
 
         Console.WriteLine("🔧 Tratamento de dados... 🔄");
-        await new ProcesssaDados(pgConnection, tokenConversao, urlBase).Executar();
+        await new ProcesssaDados(pgConnection, odbcConnection, tokenConversao, urlBase).Executar();
 
         Console.WriteLine("✅ Processo finalizado com sucesso!");
     }
@@ -35,6 +36,16 @@ public static class Program
         Console.WriteLine($"🔑 Usuário: {config["Postgres:Username"]}");
 
         return config;
+    }
+
+    private static OdbcConnect ConfigureOdbc(IConfiguration config)
+    {
+        string dsn = config["ODBC:DSN"];
+        Console.WriteLine($"🔌 Iniciando conexão ODBC ao DNS: {dsn}... ⏳");
+
+        var connection = new OdbcConnect(dsn);
+        connection.Connect();
+        return connection;
     }
 
     private static PgConnect ConfigurePostgres(IConfiguration config)

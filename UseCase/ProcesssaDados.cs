@@ -8,19 +8,27 @@ namespace Alpha.UseCase;
 public class ProcesssaDados
 {
     private readonly PgConnect _pgConnect;
+    private readonly OdbcConnect _odbcConnect;
     private readonly string _token;
     private readonly string _urlBase;
 
-    public ProcesssaDados(PgConnect pgConnect, string token, string urlBase)
+    public ProcesssaDados(PgConnect pgConnect, OdbcConnect odbcConnect, string token, string urlBase)
     {
         _pgConnect = pgConnect;
+        _odbcConnect = odbcConnect;
         _token = token;
         _urlBase = urlBase;
     }
 
     public async Task Executar()
     {
-        
+        await TratarBens();
+    }
+
+    public async Task TratarOrganogramas()
+    {
+        OrganogramaController organogramaController = new OrganogramaController(_pgConnect, _token, _urlBase);
+        await organogramaController.BuscarOrganogramasCloud();
     }
 
     public async Task TratarMetodoDepreciacao()
@@ -44,13 +52,13 @@ public class ProcesssaDados
     public async Task TratarGrupoBens()
     {
         GrupoBensController grupoBensController = new GrupoBensController(_pgConnect, _token, _urlBase);
-        await grupoBensController.EnviarGruposBensParaCloud();
+        await grupoBensController.BuscarGrupoBensCloud();
     }
 
-    public async Task TratarSubgrupoBens()
+    public async Task TratarEspecieBens()
     {
-        SubgrupoBensController subgrupoBensController = new SubgrupoBensController(_pgConnect, _token, _urlBase);
-        await subgrupoBensController.EnviarSubgruposBensParaCloud();
+        EspecieBensController especieBensController = new EspecieBensController(_pgConnect, _token, _urlBase);
+        await especieBensController.BuscarEspeciesBensCloud();
     }
 
     public async Task TratarEstadoConservacao()
@@ -74,19 +82,17 @@ public class ProcesssaDados
     public async Task TratarFornecedores()
     {
         FornecedorController fc = new FornecedorController(_pgConnect, _token, _urlBase);
-        await fc.AtualizarFornecedoresSemCnpjCpf();
+        //await fc.AtualizarFornecedoresSemCnpjCpf();
         //await fc.EnviarFornecedoresParaCloud();
-        //await fc.BuscarFornecedoresCloud();
+        await fc.BuscarFornecedoresCloud();
     }
 
     public async Task TratarBens()
     {
         var sqlHelper = new SqlHelper(_pgConnect);
         BensController bemController = new BensController(_pgConnect, _token, _urlBase, sqlHelper);
-        await bemController.EnviarBensParaCloud();
-        await bemController.ExcluirBensCloud();
-        await bemController.AguardarTombamento();
-        await bemController.TombarBens();
+        //await bemController.EnviarBensBethaParaCloud();
+        await bemController.TombarBensBetha();
     }
 
     public async Task TratarDepreciacoes()
@@ -103,5 +109,21 @@ public class ProcesssaDados
         var sqlHelper = new SqlHelper(_pgConnect);
         DepreciacaoBensController dbens = new DepreciacaoBensController(_pgConnect, _token, _urlBase, sqlHelper);
         await dbens.EnviarDepreciacaoBensParaCloud();
+    }
+
+    public async Task TratarBaixas()
+    {
+        var sqlHelper = new SqlHelper(_pgConnect);
+        BaixaController baixaController = new BaixaController(_pgConnect, _token, _urlBase, sqlHelper);
+        //await baixaController.InserirBaixas();
+        //await baixaController.EnviarBaixasParaCloud();
+        await baixaController.FinalizarBaixas();
+    }
+
+    public async Task TratarBaixaBens()
+    {
+        var sqlHelper = new SqlHelper(_pgConnect);
+        BaixaBensController baixaBensController = new BaixaBensController(_pgConnect, _token, _urlBase, sqlHelper);
+        await baixaBensController.EnviarBaixaBensParaCloud();
     }
 }
