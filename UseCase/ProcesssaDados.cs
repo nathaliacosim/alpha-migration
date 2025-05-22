@@ -22,8 +22,6 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        //await TratarBaixaBens();
-        await TratarDepreciacoesBens();
     }
 
     public async Task TratarTiposBaixas()

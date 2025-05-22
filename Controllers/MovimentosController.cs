@@ -4,11 +4,9 @@ using Alpha.Models.BethaCloud;
 using Dapper;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,7 +32,7 @@ public class MovimentosController
 
     private async Task<List<string>> ObterMovimentos()
     {
-        const string query = @"SELECT DISTINCT to_char(data_movimento, 'YYYY-MM') AS mesAno 
+        const string query = @"SELECT DISTINCT to_char(data_movimento, 'YYYY-MM') AS mesAno
                                FROM (
                                     SELECT dt_baixa::DATE AS data_movimento FROM baixa_cabecalho_cloud
                                     UNION
@@ -170,12 +168,9 @@ public class MovimentosController
             }
         }
 
-       
-            await FinalizarDepreciacao(depreciacao.id_cloud);
-            await Task.Delay(4000); // Pequena pausa entre depreciações
-        return true;       
-       
-
+        await FinalizarDepreciacao(depreciacao.id_cloud);
+        await Task.Delay(4000); // Pequena pausa entre depreciações
+        return true;
     }
 
     private async Task<List<T>> BuscarDados<T>(string query, object parametros)
@@ -278,6 +273,7 @@ public class MovimentosController
     }
 
     private async Task<List<BaixaBem>> BuscaBaixas(string data) => await BuscarDados<BaixaBem>("SELECT * FROM baixas_cloud WHERE data_baixa = @data", new { data }).ConfigureAwait(false);
+
     private async Task<List<ReavaliacaoBem>> BuscaReavaliacoes(string data) => await BuscarDados<ReavaliacaoBem>("SELECT * FROM reavaliacao_cloud WHERE data_reav_bem = @data", new { data }).ConfigureAwait(false);
 
     private async Task<bool> VerificaSeDepreciacaoJaFoiEnviada(string idCabecalho, string idBem)
@@ -481,7 +477,6 @@ public class MovimentosController
         Console.WriteLine($"⚠️ Todas as tentativas de finalização da depreciação {idCabecalho} foram esgotadas.");
     }
 
-
     private async Task<bool> EnviarBaixaParaCloudAsync(List<BaixaBem> baixaBens, int tentativas = 0)
     {
         const int maxTentativas = 3;
@@ -523,7 +518,7 @@ public class MovimentosController
                     {
                         Console.WriteLine($"⚠️ Resposta da API está vazia. Não é possível atualizar o banco.");
                         continue;
-                    }                   
+                    }
 
                     var queryUp = @"UPDATE baixas_cloud SET id_cloud = @IdCloud WHERE id = @Codigo;";
                     var parameters = new
@@ -545,7 +540,8 @@ public class MovimentosController
                     {
                         Console.WriteLine($"⚠️ Nenhum registro foi atualizado para o bem {item.i_bem}.");
                     }
-                } else if (responseBody.Contains("não pode ser inserido pois está baixado"))
+                }
+                else if (responseBody.Contains("não pode ser inserido pois está baixado"))
                 {
                     Console.WriteLine($"⚠️ Bem {item.i_bem} já foi baixado, será considerado como enviado.");
                     continue;
@@ -602,24 +598,24 @@ public class MovimentosController
         }
     }
 
-    private async Task<bool> EnviarReavaliacaoParaCloudAsync(List<ReavaliacaoBem> reavaliacaoBens, int tentativas = 0) 
-    { 
+    private async Task<bool> EnviarReavaliacaoParaCloudAsync(List<ReavaliacaoBem> reavaliacaoBens, int tentativas = 0)
+    {
         const int maxTentativas = 3;
 
         foreach (var itens in reavaliacaoBens)
         {
             var payload = new ReavaliacaoBemPOST
             {
-               reavaliacao = new ReavaliacaoReavaliacaoBemPOST
-               {
-                   id = int.Parse(itens.id_cloud_reavaliacao),
-               },
-               bem = new BemReavaliacaoBemPOST
-               {
-                   id = int.Parse(itens.id_cloud_bem)
-               },
-               vlBem = itens.vlr_reav_bem,
-               notaExplicativa = ""
+                reavaliacao = new ReavaliacaoReavaliacaoBemPOST
+                {
+                    id = int.Parse(itens.id_cloud_reavaliacao),
+                },
+                bem = new BemReavaliacaoBemPOST
+                {
+                    id = int.Parse(itens.id_cloud_bem)
+                },
+                vlBem = itens.vlr_reav_bem,
+                notaExplicativa = ""
             };
 
             var json = JsonConvert.SerializeObject(payload);

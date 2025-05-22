@@ -33,6 +33,7 @@ public class BaixaBensController
     }
 
     #region Betha
+
     public async Task<List<BaixaBensBethaDba>> SelecionarBaixaBensBetha()
     {
         const string query = "SELECT i_baixa, i_motivo, i_bem, CONVERT(VARCHAR(10), data_baixa, 120) as data_baixa, i_entidades FROM bethadba.baixas;";
@@ -64,7 +65,7 @@ public class BaixaBensController
             const string checkExistsQuery = "SELECT COUNT(*) FROM baixas_cloud WHERE i_baixa = @i_baixa;";
             const string insertQuery = @"INSERT INTO baixas_cloud
                                           (id_cloud, i_baixa, i_motivo, i_bem, id_cloud_bem, id_cloud_baixa, data_baixa, i_entidades)
-                                         VALUES 
+                                         VALUES
                                           (@id_cloud, @i_baixa, @i_motivo, @i_bem, @id_cloud_bem, @id_cloud_baixa, @data_baixa, @i_entidades);";
 
             var parametros = new
@@ -301,6 +302,7 @@ public class BaixaBensController
     #endregion Betha
 
     #region Mercato
+
     public async Task<List<BaixaMercato>> SelecionarBaixasMercato()
     {
         const string query = "SELECT * FROM pat_baixas WHERE id_cloud IS NOT NULL ORDER BY data_baixa;";

@@ -1,7 +1,6 @@
 ﻿using Alpha.Data;
 using Alpha.Models.Alpha;
 using Alpha.Models.BethaCloud;
-using Alpha.Utils;
 using Dapper;
 using Newtonsoft.Json;
 using System;
@@ -169,7 +168,8 @@ public class ReavaliacaoController
 
             var query = $"UPDATE reavaliacao_cabecalho_cloud SET id_cloud = '{responseBody}' WHERE id = {reavaliacao.id};";
             await _pgConnect.ExecuteNonQueryAsync(query);
-        } else
+        }
+        else
         {
             Console.WriteLine($"❌ Erro ao enviar reavaliação para a nuvem: {responseBody}");
         }

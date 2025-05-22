@@ -3,9 +3,7 @@ using Alpha.Models.Alpha;
 using Dapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Alpha.Controllers;
@@ -58,14 +56,14 @@ public class ReavaliacaoBensController
         {
             const string checkExistsQuery = "SELECT COUNT(*) FROM reavaliacao_cloud WHERE i_reav_bem = @i_reav_bem;";
             const string insertQuery = @"INSERT INTO reavaliacao_cloud
-                                          (id_cloud, id_cloud_reavaliacao, i_reav_bem, i_bem, data_reav_bem, vlr_reav_bem, vlr_reav_resid, 
-                                           valor_resid_ant, valor_deprec_ant, vlr_atual_ant, motivo_reav_bem, i_comissoes, matricula_pessoal, 
-                                           nro_portaria, dt_portaria, tipo_reav, novo_perc_deprec, i_entidades, i_incorporacoes, vida_util_novo, 
+                                          (id_cloud, id_cloud_reavaliacao, i_reav_bem, i_bem, data_reav_bem, vlr_reav_bem, vlr_reav_resid,
+                                           valor_resid_ant, valor_deprec_ant, vlr_atual_ant, motivo_reav_bem, i_comissoes, matricula_pessoal,
+                                           nro_portaria, dt_portaria, tipo_reav, novo_perc_deprec, i_entidades, i_incorporacoes, vida_util_novo,
                                            vida_util_ant, perc_deprec_ant, valor_depreciavel)
-                                          VALUES 
-                                          (@id_cloud, @id_cloud_reavaliacao, @i_reav_bem, @i_bem, @data_reav_bem, @vlr_reav_bem, @vlr_reav_resid, 
-                                           @valor_resid_ant, @valor_deprec_ant, @vlr_atual_ant, @motivo_reav_bem, @i_comissoes, @matricula_pessoal, 
-                                           @nro_portaria, @dt_portaria, @tipo_reav, @novo_perc_deprec, @i_entidades, @i_incorporacoes, @vida_util_novo, 
+                                          VALUES
+                                          (@id_cloud, @id_cloud_reavaliacao, @i_reav_bem, @i_bem, @data_reav_bem, @vlr_reav_bem, @vlr_reav_resid,
+                                           @valor_resid_ant, @valor_deprec_ant, @vlr_atual_ant, @motivo_reav_bem, @i_comissoes, @matricula_pessoal,
+                                           @nro_portaria, @dt_portaria, @tipo_reav, @novo_perc_deprec, @i_entidades, @i_incorporacoes, @vida_util_novo,
                                            @vida_util_ant, @perc_deprec_ant, @valor_depreciavel);";
 
             var parametros = new
@@ -114,6 +112,4 @@ public class ReavaliacaoBensController
             }
         }
     }
-
-
 }

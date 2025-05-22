@@ -64,9 +64,9 @@ public class BaixaController
         foreach (var item in dados)
         {
             const string checkExistsQuery = @"SELECT COUNT(1) FROM baixa_cabecalho_cloud WHERE i_baixa = @i_baixa";
-            const string insertQuery = @"INSERT INTO baixa_cabecalho_cloud 
+            const string insertQuery = @"INSERT INTO baixa_cabecalho_cloud
                                            (id_cloud, mes, ano, mes_ano, observacao, dt_baixa, i_baixa, i_bem, i_motivo, id_cloud_tipo_baixa, finalizado, id_cloud_finalizacao)
-                                         VALUES 
+                                         VALUES
                                             (@id_cloud, @mes, @ano, @mes_ano, @observacao, @dt_baixa, @i_baixa, @i_bem, @i_motivo, @id_cloud_tipo_baixa, @finalizado, @id_cloud_finalizacao)";
 
             var dataBaixa = item.dt_baixa.Split('-');
@@ -236,8 +236,8 @@ public class BaixaController
         }
     }
 
-
     #region Conversão Mercato
+
     private async Task<List<BaixaGroupByMercato>> SelecionarBaixaBensMercato()
     {
         const string query = @"
@@ -446,5 +446,6 @@ public class BaixaController
             }
         }
     }
+
     #endregion Conversão Mercato
 }

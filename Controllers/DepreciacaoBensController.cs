@@ -278,6 +278,7 @@ public class DepreciacaoBensController
     #endregion Conversão Betha
 
     #region Conversão Mercato
+
     public async Task<List<DepreciacaoMercato>> SelecionarDepreciacoes()
     {
         const string query = "SELECT * FROM pat_cabecalho_depreciacao WHERE id_cloud IS NOT NULL AND finalizado = 'false' ORDER BY ano, mes;";
