@@ -2,7 +2,59 @@
 
 namespace Alpha.Models.Alpha;
 
-public class BaixaBens
+#region Betha
+public class BaixasBethaDba
+{
+    public int i_baixa { get; set; }
+    public int i_motivo { get; set; }
+    public int i_bem { get; set; }
+    public string dt_baixa { get; set; }
+    public string observacao { get; set; }
+}
+
+public class BaixaBensBethaDba
+{
+    public int i_baixa { get; set; }
+    public int i_motivo { get; set; }
+    public int i_bem { get; set; }
+    public string data_baixa { get; set; }
+    public int i_entidades { get; set; }
+}
+
+public class BaixasCabecalho
+{
+    public int id { get; set; }
+    public string id_cloud { get; set; }
+    public int i_motivo { get; set; }
+    public int id_cloud_tipo_baixa { get; set; }
+    public string mes { get; set; }
+    public string ano { get; set; }
+    public string mes_ano { get; set; }
+    public string dt_baixa { get; set; }
+    public string observacao { get; set; }
+    public string finalizado { get; set; }
+    public int id_cloud_finalizacao { get; set; }
+}
+
+public class BaixaBem
+{
+    public int id { get; set; }
+    public string id_cloud { get; set; }
+    public int i_baixa { get; set; }
+    public int i_motivo { get; set; }
+    public int i_bem { get; set; }
+    public int id_cloud_bem { get; set; }
+    public int id_cloud_baixa { get; set; }
+    public string data_baixa { get; set; }
+    public string nota_explicativa { get; set; }
+    public int i_entidades { get; set; }
+    public string id_cloud_baixa_bem { get; set; }
+}
+
+#endregion Betha
+
+#region Mercato
+public class BaixaBensMercato
 {
     public int codigo { get; set; }
     public int? ano { get; set; }
@@ -41,13 +93,13 @@ public class BaixaBens
     public string id_cloud_bem { get; set; }
 }
 
-public class BaixaGroupBy
+public class BaixaGroupByMercato
 {
     public string data_baixa { get; set; }
     public int tipo_baixa { get; set; }
 }
 
-public class Baixa
+public class BaixaMercato
 {
     public int id { get; set; }
     public string id_cloud { get; set; }
@@ -56,3 +108,4 @@ public class Baixa
     public string id_cloud_tp_baixa { get; set; }
     public string descricao_motivo { get; set; }
 }
+#endregion Mercato

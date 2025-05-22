@@ -136,11 +136,13 @@
     <Compile Include="Controllers\GrupoBensController.cs" />
     <Compile Include="Controllers\LocalizacaoFisicaController.cs" />
     <Compile Include="Controllers\MetodoDepreciacaoController.cs" />
+    <Compile Include="Controllers\MovimentosController.cs" />
     <Compile Include="Controllers\OrganogramaController.cs" />
     <Compile Include="Controllers\EspecieBensController.cs" />
     <Compile Include="Controllers\ReavaliacaoBensController.cs" />
     <Compile Include="Controllers\ReavaliacaoController.cs" />
     <Compile Include="Controllers\TipoAquisicaoController.cs" />
+    <Compile Include="Controllers\TipoBaixaController.cs" />
     <Compile Include="Controllers\TipoBensController.cs" />
     <Compile Include="Controllers\TipoUtilizacaoController.cs" />
     <Compile Include="Data\OdbcConnect.cs" />
@@ -155,6 +157,7 @@
     <Compile Include="Models\Alpha\Reavaliacao.cs" />
     <Compile Include="Models\Alpha\SubgrupoBens.cs" />
     <Compile Include="Models\Alpha\TipoAquisicao.cs" />
+    <Compile Include="Models\Alpha\TipoBaixa.cs" />
     <Compile Include="Models\Alpha\TipoBem.cs" />
     <Compile Include="Models\Alpha\TipoUtilizacao.cs" />
     <Compile Include="Models\BethaCloud\Baixas.cs" />
@@ -169,6 +172,7 @@
     <Compile Include="Models\BethaCloud\EspecieBens.cs" />
     <Compile Include="Models\BethaCloud\Reavaliacao.cs" />
     <Compile Include="Models\BethaCloud\TipoAquisicao.cs" />
+    <Compile Include="Models\BethaCloud\TipoBaixa.cs" />
     <Compile Include="Models\BethaCloud\TipoBem.cs" />
     <Compile Include="Models\BethaCloud\TipoUtilizacao.cs" />
     <Compile Include="Program.cs" />
@@ -187,6 +191,7 @@
   <ItemGroup>
     <Content Include="SQL\sql_betha.sql" />
     <Content Include="SQL\sql_mercato.sql" />
+    <Content Include="SQL\updates_betha.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />

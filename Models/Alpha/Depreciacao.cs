@@ -35,12 +35,26 @@ public class DepreciacaoBens
     public int meses_depreciados { get; set; }
     public int meses_restantes { get; set; }
     public DateTime data_depreciacao { get; set; }
-    public string? id_cloud_depreciacao { get; set; }
-    public string? id_cloud_bem { get; set; }
-    public string? id_cloud { get; set; }
+    public string id_cloud_depreciacao { get; set; }
+    public string id_cloud_bem { get; set; }
+    public string id_cloud { get; set; }
 }
 
 #region Models Betha
+
+public class DepreciacaoBem
+{
+    public int id { get; set; }
+    public string id_cloud { get; set; }
+    public int i_depreciacao { get; set; }
+    public int i_bem { get; set; }
+    public int id_cloud_bem { get; set; }
+    public int id_cloud_depreciacao { get; set; }
+    public string data_depreciacao { get; set; }
+    public decimal valor_depreciado { get; set; }
+    public int i_entidades { get; set; }
+    public string id_cloud_bem_depreciado { get; set; }
+}
 
 public class DepreciacaoCabecalhoBethaDba
 {
@@ -73,6 +87,9 @@ public class DepreciacaoCabecalho
     public string ano { get; set; }
     public string mes_ano { get; set; }
     public string observacao { get; set; }
+    public string finalizado { get; set; }
+    public string id_cloud_finalizacao { get; set; }
+    public int qtd_itens { get; set; }
 }
 
 public class DepreciacaoBensBethaDba

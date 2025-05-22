@@ -22,7 +22,14 @@ public class ProcesssaDados
 
     public async Task Executar()
     {
-        await TratarReavaliacoes();
+        //await TratarBaixaBens();
+        await TratarDepreciacoesBens();
+    }
+
+    public async Task TratarTiposBaixas()
+    {
+        TipoBaixaController tipoBaixaController = new TipoBaixaController(_pgConnect, _token, _urlBase, _odbcConnect);
+        await tipoBaixaController.EnviarTiposBaixasBethaParaCloud();
     }
 
     public async Task TratarOrganogramas()
@@ -119,22 +126,27 @@ public class ProcesssaDados
     {
         var sqlHelper = new SqlHelper(_pgConnect);
         DepreciacaoBensController dbens = new DepreciacaoBensController(_pgConnect, _token, _urlBase, sqlHelper, _odbcConnect);
-        await dbens.InserirDepreciacoesBensBetha();
+        await dbens.EnviarDepreciacaoBensBethaParaCloud();
     }
 
     public async Task TratarBaixas()
     {
         var sqlHelper = new SqlHelper(_pgConnect);
-        BaixaController baixaController = new BaixaController(_pgConnect, _token, _urlBase, sqlHelper);
-        //await baixaController.InserirBaixas();
-        //await baixaController.EnviarBaixasParaCloud();
-        await baixaController.FinalizarBaixas();
+        BaixaController baixaController = new BaixaController(_pgConnect, _token, _urlBase, sqlHelper, _odbcConnect);
+        await baixaController.EnviarBaixasBethaParaCloud();
     }
 
     public async Task TratarBaixaBens()
     {
         var sqlHelper = new SqlHelper(_pgConnect);
-        BaixaBensController baixaBensController = new BaixaBensController(_pgConnect, _token, _urlBase, sqlHelper);
-        await baixaBensController.EnviarBaixaBensParaCloud();
+        BaixaBensController baixaBensController = new BaixaBensController(_pgConnect, _token, _urlBase, sqlHelper, _odbcConnect);
+        //await baixaBensController.EnviarBaixaBensBethaParaCloud();
+        await baixaBensController.FinalizarBaixasBetha();
+    }
+
+    public async Task TratarMovimentos()
+    {
+        MovimentosController movimentosController = new MovimentosController(_pgConnect, _token, _urlBase, _odbcConnect);
+        await movimentosController.ProcessarMovimentos();
     }
 }

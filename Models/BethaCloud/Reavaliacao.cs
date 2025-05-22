@@ -37,3 +37,22 @@ public class TipoReavaliacaoValorizacao
 {
     public int id { get; set; }
 }
+
+public class BemReavaliacaoBemPOST
+{
+    public int id { get; set; }
+}
+
+public class ReavaliacaoReavaliacaoBemPOST
+{
+    public int id { get; set; }
+}
+
+public class ReavaliacaoBemPOST
+{
+    public ReavaliacaoReavaliacaoBemPOST reavaliacao { get; set; }
+    public BemReavaliacaoBemPOST bem { get; set; }
+    public object metodoDepreciacao { get; set; }
+    public object notaExplicativa { get; set; }
+    public decimal vlBem { get; set; }
+}

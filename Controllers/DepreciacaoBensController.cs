@@ -104,10 +104,180 @@ public class DepreciacaoBensController
         }
     }
 
+    public async Task<List<DepreciacaoCabecalho>> SelecionarDepreciacoesBetha()
+    {
+        const string query = "SELECT * FROM depreciacao_cabecalho_cloud WHERE id = 64;";
+        try
+        {
+            using var connection = _pgConnect.GetConnection();
+            return (await connection.QueryAsync<DepreciacaoCabecalho>(query)).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Erro ao selecionar cabeçalho das depreciações: {ex.Message}");
+            return new();
+        }
+    }
+
+    private async Task<List<DepreciacaoBem>> ObterBensDaDepreciacaoBethaAsync(string idCabecalho)
+    {
+        const string query = "SELECT * FROM depreciacoes_cloud WHERE id_cloud_depreciacao = @id_cabecalho;";
+        using var connection = _pgConnect.GetConnection();
+        return (await connection.QueryAsync<DepreciacaoBem>(query, new { id_cabecalho = int.Parse(idCabecalho) })).ToList();
+    }
+
+    public async Task EnviarDepreciacaoBensBethaParaCloud()
+    {
+        var cabecalhos = await SelecionarDepreciacoesBetha();
+
+        if (!cabecalhos.Any())
+        {
+            Console.WriteLine("⚠️ Nenhum cabeçalho de depreciação encontrada no banco.");
+            return;
+        }
+
+        foreach (var cabecalho in cabecalhos)
+        {
+            Console.WriteLine($"\n🛠️ Processando bens da depreciação {cabecalho.mes_ano}...");
+
+            var bens = await ObterBensDaDepreciacaoBethaAsync(cabecalho.id_cloud);
+
+            if (bens is null || !bens.Any())
+            {
+                Console.WriteLine($"❌ Nenhum bem encontrado para {cabecalho.mes_ano}.");
+                continue;
+            }
+
+            Console.WriteLine($"📦 {bens.Count}/{cabecalho.qtd_itens} bens encontrados.");
+
+            int enviados = 0;
+
+            foreach (var bem in bens)
+            {
+                Console.WriteLine($"🔍 Verificando se o bem {bem.i_bem} já foi enviado...");
+
+                if (await VerificaSeJaFoiEnviado(bem.id_cloud_depreciacao.ToString(), bem.id_cloud.ToString()))
+                {
+                    Console.WriteLine($"ℹ️ Bem {bem.i_bem} já foi enviado anteriormente.");
+                    enviados++;
+                    continue;
+                }
+
+                Console.WriteLine($"🚀 Enviando bem {bem.i_bem}...");
+                if (await EnviarBemDepreciadoBethaAsync(bem))
+                {
+                    enviados++;
+                    Console.WriteLine($"📈 Progresso: {enviados}/{bens.Count} bens enviados.");
+                }
+
+                Console.WriteLine("\n");
+            }
+
+            if (enviados == cabecalho.qtd_itens)
+            {
+                Console.WriteLine($"✅ Todos os {enviados} bens da depreciação {cabecalho.mes_ano} foram enviados com sucesso.");
+                await FinalizarDepreciacao(cabecalho.id_cloud);
+                await Task.Delay(2000);
+            }
+            else
+            {
+                Console.WriteLine($"\n\n\n⚠️ {enviados}/{cabecalho.qtd_itens} bens enviados para {cabecalho.mes_ano}. Finalização **não** será feita.");
+                Console.WriteLine($"⚠️ Verifique os bens que não foram enviados e tente novamente.");
+                return;
+            }
+        }
+    }
+
+    private async Task<bool> EnviarBemDepreciadoBethaAsync(DepreciacaoBem bem, int tentativas = 0)
+    {
+        if (bem.valor_depreciado <= 0)
+        {
+            Console.WriteLine($"⚠️ O bem {bem.i_bem} não possui valor de depreciação. Não será enviado.");
+            return true;
+        }
+
+        const int maxTentativas = 3;
+
+        var payload = new DepreciacaoBemPOST
+        {
+            depreciacao = new DepreciacaoDepreciacaoBemPOST
+            {
+                id = bem.id_cloud_depreciacao
+            },
+            bem = new BemDepreciacaoBemPOST
+            {
+                id = bem.id_cloud_bem
+            },
+            vlDepreciado = bem.valor_depreciado,
+            notaExplicativa = ""
+        };
+
+        var json = JsonConvert.SerializeObject(payload);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+        var url = $"{_urlBase}api/depreciacoes/{bem.id_cloud_depreciacao}/bens";
+
+        try
+        {
+            var response = await _httpClient.PostAsync(url, content);
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine($"📄 Resposta da API para o bem {bem.i_bem}: {responseBody}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"✅ Bem {bem.i_bem} enviado com sucesso.");
+
+                if (string.IsNullOrWhiteSpace(responseBody))
+                {
+                    Console.WriteLine($"⚠️ Resposta da API está vazia. Não é possível atualizar o banco.");
+                    return false;
+                }
+
+                var queryUp = @"UPDATE depreciacoes_cloud SET id_cloud = @IdCloud WHERE id = @Id;";
+                var parameters = new
+                {
+                    IdCloud = responseBody,
+                    Id = bem.id
+                };
+
+                using var connection = _pgConnect.GetConnection();
+                var rowsAffected = await connection.ExecuteAsync(queryUp, parameters);
+
+                if (rowsAffected > 0)
+                {
+                    Console.WriteLine($"💾 Registro do bem {bem.i_bem} atualizado com id_cloud = '{responseBody}'.");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Nenhum registro foi atualizado para o bem {bem.i_bem}.");
+                    return false;
+                }
+            }
+            else
+            {
+                Console.WriteLine($"❌ Falha ao enviar bem {bem.i_bem}: {response.StatusCode}");
+
+                if (tentativas < maxTentativas)
+                {
+                    Console.WriteLine($"🔁 Tentando novamente ({tentativas + 1}/{maxTentativas})...");
+                    await Task.Delay(3000);
+                    return await EnviarBemDepreciadoBethaAsync(bem, tentativas + 1);
+                }
+
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Exceção ao enviar bem {bem.i_bem}: {ex.Message}");
+            return false;
+        }
+    }
+
     #endregion Conversão Betha
 
     #region Conversão Mercato
-
     public async Task<List<DepreciacaoMercato>> SelecionarDepreciacoes()
     {
         const string query = "SELECT * FROM pat_cabecalho_depreciacao WHERE id_cloud IS NOT NULL AND finalizado = 'false' ORDER BY ano, mes;";
@@ -187,9 +357,9 @@ public class DepreciacaoBensController
 
     private async Task<bool> VerificaSeJaFoiEnviado(string idCabecalho, string idBem)
     {
-        if (idBem == null)
+        if (string.IsNullOrEmpty(idBem))
         {
-            Console.WriteLine($"❌ ID do bem é nulo. Não é possível verificar se foi enviado.");
+            Console.WriteLine($"❌ ID do bem é nulo ou vazio. Não é possível verificar se foi enviado.");
             return false;
         }
 
@@ -360,7 +530,7 @@ public class DepreciacaoBensController
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine($"✅ Depreciação {idCabecalho} finalizada com sucesso.\n");
-                await MarcarDepreciacaoComoFinalizadaAsync(idCabecalho);
+                //await MarcarDepreciacaoComoFinalizadaAsync(idCabecalho);
             }
             else
             {
